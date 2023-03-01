@@ -43,16 +43,21 @@ do
 	Write-Host "Uptime   : " -ForegroundColor Cyan -NoNewline; Write-Host $uptime.Days"Days" $uptime.Hours"Hours" $uptime.Minutes"Mins" $uptime.Seconds"Secs" -NoNewline; Write-Host " | " -NoNewline; Write-Host "Tokens : " -ForegroundColor Cyan -NoNewline; Write-Host ($walletData.result/100000000) -ForegroundColor Green -NoNewline; Write-Host " | " -NoNewline; Write-Host "Token in USD : " -ForegroundColor Cyan -NoNewline; Write-Host $balanceInUSD -ForegroundColor Green -NoNewline; Write-Host " | " -NoNewline; Write-Host "1 token (USD) : " -ForegroundColor Cyan -NoNewline; Write-Host $tokenPrice -ForegroundColor Green
 	iF($SNOdata.quicStatus -eq "OK") { $fontColor = "Green" } else { $fontColor="Red" }
 	Write-Host "Time since last QUIC ping :" -ForegroundColor Cyan -NoNewline; Write-Host $quicUptime.Days"Days" $quicUptime.Hours"Hours" $quicUptime.Minutes"Mins" $quicUptime.Seconds"Secs Ago | " -NoNewline; Write-Host "QUIC status: " -ForegroundColor Cyan -NoNewline; Write-Host $SNOdata.quicStatus -ForegroundColor $fontColor -NoNewline; Write-Host " | " -NoNewline; Write-Host "Configured Port: " -ForegroundColor Cyan -NoNewline; Write-Host $SNOdata.configuredPort
-	Write-Host "_______________________________________________________________________________________________________________"
+	Write-Host "_____________________________________________________________________________________________________________________"
 	Write-Host "`t   Current |`tAllowed  |`t Latest Release |`tLatest Release Published on | Is version uptodate?" -ForegroundColor Cyan
 	if ($SNOdata.upToDate -eq "True") { $fontColor = "Green" }
 	else { $fontColor = "Red" }
 	Write-Host "Version  :" $SNOdata.version " |`t" $SNOdata.allowedVersion " |`t" $ver[0].name "`t|`t" $ver[0].published_at "`t    |  " -NoNewline; Write-Host $SNOdata.upToDate -ForegroundColor $fontColor
-	Write-Host "______________________________________________________________________________________"
-	Write-Host "`t`t Used(GB)`t  |  Allocated(GB) |`t Trash(GB) |`t Overused(GB)" -ForegroundColor Cyan
-	Write-Host "DiskSpace: `t" ([math]::round($SNOdata.diskSpace.used/1000000000, 3)) "`t  |`t" ([math]::round($SNOdata.diskSpace.available/1000000000, 3)) "`t   |`t" ([math]::round($SNOdata.diskSpace.trash/1000000000, 3)) "  |`t" ([math]::Round($SNOdata.diskSpace.overused/1000000000, 3))
-	Write-Host "Bandwidth: `t" ([math]::round($SNOdata.bandwidth.used/1000000000, 3))
+	Write-Host "________________________________________________________________________________________________________"
+	Write-Host "`t`t Used(GB)`t  |  Allocated(GB) |`t Trash(GB) |`t Overused(GB) |`t Available(GB)" -ForegroundColor Cyan
+	Write-Host "DiskSpace: `t" ([math]::round($SNOdata.diskSpace.used/1000000000, 3)) "`t  |`t" ([math]::round($SNOdata.diskSpace.available/1000000000, 3)) "`t   |`t" ([math]::round($SNOdata.diskSpace.trash/1000000000, 3)) "  |`t " ([math]::Round($SNOdata.diskSpace.overused/1000000000, 3)) "`t      |`t" (([math]::round($SNOdata.diskSpace.available/1000000000, 3)) -(([math]::round($SNOdata.diskSpace.used/1000000000, 3)) + ([math]::round($SNOdata.diskSpace.trash/1000000000, 3))) )
+	Write-Host "Bandwidth: `t" ([math]::round($SNOdata.bandwidth.used/1000000000, 3)) -NoNewline
+	Write-Host "`t`t  [Egress (GB)] : " -NoNewline -ForegroundColor Cyan
+	Write-Host ([math]::round($satData.egressSummary/1000000000, 3)) -NoNewline
+	Write-Host "`t`t   [Ingress (GB)] : " -NoNewline -ForegroundColor Cyan
+	Write-Host ([math]::Round($satData.ingressSummary/1000000000,3))
 	
+	Write-Host "________________________________________________________________________________________________________"
 	Write-Host "SN |`tSatellite ID`t`t`t`t`t`t| Disqualified? | Suspended?`t| Storage Used(GB)| Audit Score | Suspension Score | Online Score | Satellite URL " -ForegroundColor Cyan
 	Write-Host "__________________________________________________________________________________________________________________________________________________________________________________________________"
 	for ($i = 0; $i -lt ($SNOdata.satellites).Count; $i++)
