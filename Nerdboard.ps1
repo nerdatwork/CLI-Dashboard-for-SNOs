@@ -75,19 +75,19 @@ do
 		
 		#Color code audit/suspension/online scores: Less than 99: Yellow ; Less than 96: Red 
 		
-		if ($satData.audits[$i].auditScore -lt 0.99) { $fontColor = "Yellow" }
+		if (($satData.audits[$i].auditScore -gt 0.96) -and ($satData.audits[$i].auditScore -lt 0.99) ) { $fontColor = "Yellow" }
 		elseif ($satData.audits[$i].auditScore -lt 0.96) { $fontColor = "Red" }
 		else { $fontColor = "White" }
 		Write-Host ("{0:n7}" -f $satData.audits[$i].auditScore) -NoNewline -ForegroundColor $fontColor
 		Write-Host "   |   " -NoNewline
 		
-		if ($satData.audits[$i].suspensionScore -lt 0.99) { $fontColor = "Yellow" }
+		if (($satData.audits[$i].suspensionScore -gt 0.96) -and ($satData.audits[$i].suspensionScore -lt 0.99) ) { $fontColor = "Yellow" }
 		elseif ($satData.audits[$i].suspensionScore -lt 0.96) { $fontColor = "Red" }
 		else { $fontColor = "White" }
 		Write-Host ("{0:n7}" -f $satData.audits[$i].suspensionScore) -NoNewline -ForegroundColor $fontColor
 		Write-Host "      |   " -NoNewline
 		
-		if ($satData.audits[$i].onlineScore -lt 0.99) { $fontColor = "Yellow" }
+		if (($satData.audits[$i].onlineScore -gt 0.96) -and ($satData.audits[$i].onlineScore -lt 0.99)) { $fontColor = "Yellow" }
 		elseif ($satData.audits[$i].onlineScore -lt 0.96) { $fontColor = "Red" }
 		else { $fontColor = "White" }
 		Write-Host ("{0:n7}" -f $satData.audits[$i].onlineScore) -NoNewline -ForegroundColor $fontColor
