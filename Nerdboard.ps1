@@ -56,7 +56,16 @@ do
 	Write-Host ([math]::round($satData.egressSummary/1000000000, 3)) -NoNewline
 	Write-Host "`t`t   [Ingress (GB)] : " -NoNewline -ForegroundColor Cyan
 	Write-Host ([math]::Round($satData.ingressSummary/1000000000,3))
-	
+
+	#Today's bandwidth
+	$egressToday = $satData.bandwidthDaily[($satData.bandwidthDaily.count) - 1].egress.repair + $satData.bandwidthDaily[($satData.bandwidthDaily.count) - 1].egress.audit + $satData.bandwidthDaily[($satData.bandwidthDaily.count) - 1].egress.usage
+	$ingressToday = $satData.bandwidthDaily[($satData.bandwidthDaily.count) - 1].ingress.repair + $satData.bandwidthDaily[($satData.bandwidthDaily.count) - 1].ingress.usage
+	Write-Host "Bandwidth Today:" -NoNewline -ForegroundColor Yellow
+	Write-Host "`t`t  [Egress (GB)] : " -NoNewline -ForegroundColor Cyan
+	Write-Host ([math]::round($egressToday/1000000000, 3)) -NoNewline
+	Write-Host "`t`t   [Ingress (GB)] : " -NoNewline -ForegroundColor Cyan
+	Write-Host ([math]::round($ingressToday/1000000000, 3))
+ 
 	Write-Host "________________________________________________________________________________________________________"
 	Write-Host "SN |`tSatellite ID`t`t`t`t`t`t| Disqualified? | Suspended?`t| Storage Used(GB)| Audit Score | Suspension Score | Online Score | Satellite URL " -ForegroundColor Cyan
 	Write-Host "__________________________________________________________________________________________________________________________________________________________________________________________________"
