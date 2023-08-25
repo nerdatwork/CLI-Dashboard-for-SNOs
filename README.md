@@ -4,7 +4,7 @@ The current dashboard lacks many data points which lead me to write this code.
 
 This dashboard has almost all of the details as shown on web dashboard.
 
-<b>Step 1 </b>: Generate API key on Etherscan.io. It should be under https://etherscan.io/myapikey. Add this API key to `apikey.txt` file. DO NOT ADD any other text to the file besidse API key.
+<b>Step 1 </b>: Generate API key on Etherscan.io. It should be under https://etherscan.io/myapikey. Add this API key to `apikey.txt` file. DO NOT ADD any other text to the file besides API key.
 
 <b>Step 2</b>: Make sure `apikey.txt` and `Nerdboard.ps1` are in the same directory.
 
