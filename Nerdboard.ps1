@@ -2,6 +2,13 @@
 # CLI Dashboard for SNOs
 # Brought to you by </NerdAtWork>
 
+#Title the window
+$host.ui.rawui.windowtitle="NerdBoard"
+
+#Powershell 7.2 introduced this amazing $PSStyle variable.
+$PSStyle.Progress.View = "Minimal"
+$PSStyle.Progress.Style = "`e[45m"
+
 function Pause (){
 	Write-Host "`tPress ENTER to refresh" -BackgroundColor Gray -ForegroundColor Magenta
 	$null = Read-Host 
@@ -12,17 +19,30 @@ do
 	Clear-Host
 	
 	$satData = Invoke-WebRequest 'http://127.0.0.1:14002/api/sno/satellites' | ConvertFrom-Json
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((1/7) * 100);
+	
 	$SNOdata = Invoke-WebRequest 'http://127.0.0.1:14002/api/sno' | ConvertFrom-Json
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((2/7) * 100);
+	
 	$payData = Invoke-WebRequest 'http://127.0.0.1:14002/api/sno/estimated-payout' | ConvertFrom-Json
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((3/7) * 100);
+	
 	$ver = Invoke-WebRequest 'https://api.github.com/repos/storj/storj/releases' | ConvertFrom-Json
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((4/7) * 100);
+	
+	$nodeVersion = Invoke-WebRequest 'https://version.storj.io' | ConvertFrom-Json
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((5/7) * 100);
+	
 	$tokenData = Invoke-WebRequest 'https://api.coingecko.com/api/v3/coins/ethereum/contract/0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC' | ConvertFrom-Json
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((6/7) * 100);
 	
 	# Get Etherscan.io API key
 	$apiKey = Get-Content apikey.txt
 	
 	$ethAdd = $SNOdata.wallet
 	$customURL = "https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC&address=$ethAdd&tag=latest&apikey=$apiKey"
-	
+	Write-Progress -Activity "Collecting data" -Status "Completed!" -PercentComplete ((7/7) * 100) -Completed ;
+ 
 	$walletData = Invoke-WebRequest $customURL | ConvertFrom-Json
 	
 	$uptime = New-TimeSpan -Start $SNOdata.startedAt -End $SNOdata.lastPinged
