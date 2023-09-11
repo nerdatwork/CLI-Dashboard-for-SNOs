@@ -1,4 +1,3 @@
-
 # CLI Dashboard for SNOs
 # Brought to you by </NerdAtWork>
 
@@ -10,7 +9,7 @@ $PSStyle.Progress.View = "Minimal"
 $PSStyle.Progress.Style = "`e[45m"
 
 function Pause (){
-	Write-Host "`tPress ENTER to refresh" -BackgroundColor Gray -ForegroundColor Magenta
+	Write-Host "`t`t$($PSStyle.Blink)" "Press ENTER to refresh" "$($PSStyle.BlinkOff)" -BackgroundColor Gray -ForegroundColor Magenta 
 	$null = Read-Host 
 }
 
@@ -19,32 +18,35 @@ do
 	Clear-Host
 	
 	$satData = Invoke-WebRequest 'http://127.0.0.1:14002/api/sno/satellites' | ConvertFrom-Json
-	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((1/7) * 100);
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((1/8) * 100);
 	
 	$SNOdata = Invoke-WebRequest 'http://127.0.0.1:14002/api/sno' | ConvertFrom-Json
-	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((2/7) * 100);
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((2/8) * 100);
 	
 	$payData = Invoke-WebRequest 'http://127.0.0.1:14002/api/sno/estimated-payout' | ConvertFrom-Json
-	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((3/7) * 100);
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((3/8) * 100);
 	
 	$ver = Invoke-WebRequest 'https://api.github.com/repos/storj/storj/releases' | ConvertFrom-Json
-	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((4/7) * 100);
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((4/8) * 100);
 	
 	$nodeVersion = Invoke-WebRequest 'https://version.storj.io' | ConvertFrom-Json
-	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((5/7) * 100);
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((5/8) * 100);
 	
 	$tokenData = Invoke-WebRequest 'https://api.coingecko.com/api/v3/coins/ethereum/contract/0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC' | ConvertFrom-Json
-	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((6/7) * 100);
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((6/8) * 100);
+	
+	$githubFile = Invoke-WebRequest 'https://api.github.com/repos/nerdatwork/CLI-Dashboard-for-SNOs' | ConvertFrom-Json
+	Write-Progress -Activity "Collecting data" -Status "Processing ..." -PercentComplete ((7/8) * 100);
 	
 	# Get Etherscan.io API key
 	$apiKey = Get-Content apikey.txt
 	
 	$ethAdd = $SNOdata.wallet
 	$customURL = "https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC&address=$ethAdd&tag=latest&apikey=$apiKey"
-	Write-Progress -Activity "Collecting data" -Status "Completed!" -PercentComplete ((7/7) * 100) -Completed ;
- 
-	$walletData = Invoke-WebRequest $customURL | ConvertFrom-Json
 	
+	$walletData = Invoke-WebRequest $customURL | ConvertFrom-Json
+	Write-Progress -Activity "Collecting data" -Status "Completed!" -PercentComplete ((8/8) * 100) -Completed ;
+ 
 	$uptime = New-TimeSpan -Start $SNOdata.startedAt -End $SNOdata.lastPinged
 	$ageDiff = (Get-Date) - $satData.earliestJoinedAt
 	$age = [System.Math]::Round($ageDiff.TotalDays)
@@ -55,19 +57,40 @@ do
 	$tokenPrice = $tokenData.market_data.current_price.usd
 	$balanceInUSD = $tokenPrice * ($walletData.result/100000000)
 	$balanceInUSD = [math]::round($balanceInUSD, 2)
+
+        #Check if script is updated or not
+	$localFile = (Get-Item "Nerdboard.ps1").LastWriteTime
+	if ($localFile -lt $githubFile.updated_at)
+	{
+		$scriptVersion = "No"
+		$scriptLinkColor = "Red"
+	}
+	else
+	{
+		$scriptVersion = "Yes"
+		$scriptLinkColor = "Green"
+	}
 	
+	#Creating Hyperlinks
+	$walletLink = $PSStyle.FormatHyperlink($SNOdata.wallet, "https://etherscan.io/address/"+ $SNOdata.wallet +"#tokentxns")
+	$githubLatest = $PSStyle.FormatHyperlink($ver[0].name,"https://github.com/storj/storj/releases/tag/"+ $ver[0].name)
+	$githubCurrent = $PSStyle.FormatHyperlink($SNOdata.version, "https://github.com/storj/storj/releases/tag/v" + $SNOdata.version)
+	$scriptLink = $PSStyle.FormatHyperlink($scriptVersion, "https://github.com/nerdatwork/CLI-Dashboard-for-SNOs")
+ 
 	Write-Host "`t`t`t`t`t###########" -ForegroundColor Magenta -NoNewline; Write-Host " Nerdboard " -ForegroundColor Green -NoNewline; Write-Host "###############" -ForegroundColor Magenta
 	Write-Host "Node ID  : " -ForegroundColor Cyan -NoNewline; Write-Host $SNOdata.nodeID -NoNewline; Write-Host " | " -NoNewline; Write-Host "Age (Days) : " -ForegroundColor Cyan -NoNewline; Write-Host $age
 	if ($SNOdata.walletFeatures -eq $null) { $walletFeatures = "None"}
-	Write-Host "Wallet   : " -NoNewline -ForegroundColor Cyan ; Write-Host $SNOdata.wallet -ForegroundColor "Red" -NoNewline; Write-Host " | Wallet Features: " -NoNewline;  Write-Host $walletFeatures -ForegroundColor Green
+	Write-Host "Wallet   : " -NoNewline -ForegroundColor Cyan ; Write-Host $walletLink -ForegroundColor "Red" -NoNewline; Write-Host " | Wallet Features: " -NoNewline;  Write-Host $walletFeatures -ForegroundColor Green
 	Write-Host "Uptime   : " -ForegroundColor Cyan -NoNewline; Write-Host $uptime.Days"Days" $uptime.Hours"Hours" $uptime.Minutes"Mins" $uptime.Seconds"Secs" -NoNewline; Write-Host " | " -NoNewline; Write-Host "Tokens : " -ForegroundColor Cyan -NoNewline; Write-Host ($walletData.result/100000000) -ForegroundColor Green -NoNewline; Write-Host " | " -NoNewline; Write-Host "Token in USD : " -ForegroundColor Cyan -NoNewline; Write-Host $balanceInUSD -ForegroundColor Green -NoNewline; Write-Host " | " -NoNewline; Write-Host "1 token (USD) : " -ForegroundColor Cyan -NoNewline; Write-Host $tokenPrice -ForegroundColor Green
 	iF($SNOdata.quicStatus -eq "OK") { $fontColor = "Green" } else { $fontColor="Red" }
 	Write-Host "Time since last QUIC ping :" -ForegroundColor Cyan -NoNewline; Write-Host $quicUptime.Days"Days" $quicUptime.Hours"Hours" $quicUptime.Minutes"Mins" $quicUptime.Seconds"Secs Ago | " -NoNewline; Write-Host "QUIC status: " -ForegroundColor Cyan -NoNewline; Write-Host $SNOdata.quicStatus -ForegroundColor $fontColor -NoNewline; Write-Host " | " -NoNewline; Write-Host "Configured Port: " -ForegroundColor Cyan -NoNewline; Write-Host $SNOdata.configuredPort
-	Write-Host "_____________________________________________________________________________________________________________________"
-	Write-Host "`t   Current |`tAllowed  |`t Latest Release |`tLatest Release Published on | Is version uptodate?" -ForegroundColor Cyan
+	Write-Host "_______________________________________________________________________________________________________________________________________________________________"
+	Write-Host "`t   Current |`tAllowed  |`t Latest Release |`tLatest Release Published on | Is version uptodate? | Is this Script Uptodate ?" " -ForegroundColor Cyan
 	if ($SNOdata.upToDate -eq "True") { $fontColor = "Green" }
 	else { $fontColor = "Red" }
-	Write-Host "Version  :" $SNOdata.version " |`t" $SNOdata.allowedVersion " |`t" $ver[0].name "`t|`t" $ver[0].published_at "`t    |  " -NoNewline; Write-Host $SNOdata.upToDate -ForegroundColor $fontColor
+	Write-Host "Version  :" $githubCurrent " |`t" $SNOdata.allowedVersion " |`t" $githubLatest "`t|`t" $ver[0].published_at "`t    |  " -NoNewline; Write-Host $SNOdata.upToDate -ForegroundColor $fontColor -NoNewline ; Write-Host "`t           |  " -NoNewline;
+ 	if ($scriptLinkColor -eq "Green") { Write-Host  $scriptVersion -ForegroundColor $scriptLinkColor }
+	else { Write-Host "$($PSStyle.Blink)" $scriptLink -ForegroundColor $scriptLinkColor }
 	Write-Host "________________________________________________________________________________________________________"
 	Write-Host "`t`t Used(GB)`t  |  Allocated(GB) |`t Trash(GB) |`t Overused(GB) |`t Available(GB)" -ForegroundColor Cyan
 	Write-Host "DiskSpace: `t" ([math]::round($SNOdata.diskSpace.used/1000000000, 3)) "`t  |`t" ([math]::round($SNOdata.diskSpace.available/1000000000, 3)) "`t   |`t" ([math]::round($SNOdata.diskSpace.trash/1000000000, 3)) "  |`t " ([math]::Round($SNOdata.diskSpace.overused/1000000000, 3)) "`t      |`t" (([math]::round($SNOdata.diskSpace.available/1000000000, 3)) -(([math]::round($SNOdata.diskSpace.used/1000000000, 3)) + ([math]::round($SNOdata.diskSpace.trash/1000000000, 3))) )
@@ -135,6 +158,3 @@ do
 	
 	Pause
 }while ($true)
-
-
-	
