@@ -85,7 +85,7 @@ do
 	iF($SNOdata.quicStatus -eq "OK") { $fontColor = "Green" } else { $fontColor="Red" }
 	Write-Host "Time since last QUIC ping :" -ForegroundColor Cyan -NoNewline; Write-Host $quicUptime.Days"Days" $quicUptime.Hours"Hours" $quicUptime.Minutes"Mins" $quicUptime.Seconds"Secs Ago | " -NoNewline; Write-Host "QUIC status: " -ForegroundColor Cyan -NoNewline; Write-Host $SNOdata.quicStatus -ForegroundColor $fontColor -NoNewline; Write-Host " | " -NoNewline; Write-Host "Configured Port: " -ForegroundColor Cyan -NoNewline; Write-Host $SNOdata.configuredPort
 	Write-Host "_______________________________________________________________________________________________________________________________________________________________"
-	Write-Host "`t   Current |`tAllowed  |`t Latest Release |`tLatest Release Published on | Is version uptodate? | Is this Script Uptodate ?" " -ForegroundColor Cyan
+	Write-Host "`t   Current |`tAllowed  |`t Latest Release |`tLatest Release Published on | Is version uptodate? | Is this Script Uptodate ?" -ForegroundColor Cyan
 	if ($SNOdata.upToDate -eq "True") { $fontColor = "Green" }
 	else { $fontColor = "Red" }
 	Write-Host "Version  :" $githubCurrent " |`t" $SNOdata.allowedVersion " |`t" $githubLatest "`t|`t" $ver[0].published_at "`t    |  " -NoNewline; Write-Host $SNOdata.upToDate -ForegroundColor $fontColor -NoNewline ; Write-Host "`t           |  " -NoNewline;
