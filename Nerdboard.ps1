@@ -60,7 +60,7 @@ do
 
         #Check if script is updated or not
 	$localFile = (Get-Item "Nerdboard.ps1").LastWriteTime
-	if ($localFile -lt $githubFile.updated_at)
+	if ($localFile -lt $githubFile.pushed_at)
 	{
 		$scriptVersion = "No"
 		$scriptLinkColor = "Red"
